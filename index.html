@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Correct Scores Hack</title>
+    <style>
+        body {
+            background-color: #00FFFF; /* Cyan background color */
+            font-family: Arial, sans-serif; /* Change the font if needed */
+        }
+
+        h1 {
+            color: #0066cc; /* Cyan text color */
+        }
+
+        form {
+            background-color: #ffffff; /* White background for the form */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            color: #0066cc; /* Cyan label text color */
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #0066cc; /* Cyan border for input fields */
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #0066cc; /* Cyan background for the submit button */
+            color: #ffffff; /* White text color for the submit button */
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0055aa; /* Darker cyan when hovering over the submit button */
+        }
+
+        ol {
+            list-style: decimal; /* Display numbers for list items */
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px; /* Space between list items */
+            color: #0066cc; /* Cyan text color for list items */
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Correct Scores Hack</h1>
+    <form action="#" method="post">
+        <label for="numSets">Number of teams:</label>
+        <input type="number" name="numSets" id="numSets" required><br>
+        <label for="target">Total Odds From Source:</label>
+        <input type="number" name="target" id="target" step="0.01" required><br>
+        <input type="submit" value="Generate Sets">
+    </form>
+
+    <div id="setsInput"></div>
+    <input type="submit" value="Start Odds Hack" id="startButton">
+    <p><strong>Possible Odds:</strong></p>
+    <ol id="result">
+    </ol>
+
+    <script>
+        // Function to dynamically create input fields for sets
+        function createSetInputs(numSets) {
+            var setsInput = document.getElementById('setsInput');
+            setsInput.innerHTML = '';
+
+            for (var i = 1; i <= numSets; i++) {
+                var label = document.createElement('label');
+                label.textContent = `Team ${i} C.S Odds (go to sporty and list all the C.S Odds *NB*.comma-separated numbers):`;
+
+                var input = document.createElement('input');
+                input.type = 'text';
+                input.name = `set${i}`;
+                input.id = `set${i}`;
+                input.required = true;
+
+                setsInput.appendChild(label);
+                setsInput.appendChild(input);
+                setsInput.appendChild(document.createElement('br'));
+            }
+        }
+
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var numSets = parseInt(document.getElementById('numSets').value);
+            createSetInputs(numSets);
+            document.getElementById('startButton').style.display = 'block'; // Display the "Start Odds Hack" button
+        });
+
+        function findClosestPair() {
+            var numSets = parseInt(document.getElementById('numSets').value);
+            var sets = [];
+            var target = parseFloat(document.getElementById('target').value);
+
+            for (var i = 1; i <= numSets; i++) {
+                sets.push(document.getElementById(`set${i}`).value.split(',').map(Number));
+            }
+
+            var closestPairs = [];
+
+            for (var i = 0; i < sets[0].length; i++) {
+                for (var j = 0; j < sets[1].length; j++) {
+                    var product = sets[0][i] * sets[1][j];
+                    closestPairs.push({ pair: [sets[0][i], sets[1][j]], product: product });
+                }
+            }
+
+            closestPairs.sort(function (a, b) {
+                return Math.abs(target - a.product) - Math.abs(target - b.product);
+            });
+
+            var resultElement = document.getElementById('result');
+            resultElement.innerHTML = '';
+
+            for (var i = 0; i < 2 && i < closestPairs.length; i++) {
+                var pair = closestPairs[i].pair;
+                var product = closestPairs[i].product;
+                var listItem = document.createElement('li');
+                listItem.textContent = `(${pair[0]}, ${pair[1]}) - ${product}`;
+                resultElement.appendChild(listItem);
+            }
+        }
+
+        document.getElementById('startButton').addEventListener('click', function () {
+            findClosestPair();
+        });
+    </script>
+</body>
+
+</html>
